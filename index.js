@@ -16,7 +16,9 @@ var SYMBOLS = {
   'dom': ['M3', 'P5', 'm7'],
   'ø': ['m3', 'd5', 'm7'],
 
-  '5': ['P5']
+  '5': ['P5'],
+
+  '6/9': ['M3', 'P5', 'M6', 'M9']
 };
 
 module.exports = function(symbol) {

@@ -40,5 +40,6 @@ test('Parsing chops', function(t) {
   t.deepEqual(daccord('5'), ['P1', 'P5']);
   t.deepEqual(daccord('add9'), ['P1', 'M3', 'P5', 'M9']);
   t.deepEqual(daccord('m13b5#9'), ['P1', 'm3', 'd5', 'm7', 'A9', 'P11', 'M13']);
+  t.deepEqual(daccord('6/9'), ['P1', 'M3', 'P5', 'M6', 'M9']);
   t.end();
 });
