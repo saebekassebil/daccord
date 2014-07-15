@@ -1,0 +1,29 @@
+{
+  "name": "daccord",
+  "version": "1.0.0",
+  "description": "Forgiving music chord parser",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/saebekassebil/daccord.git"
+  },
+  "keywords": [
+    "chord",
+    "music",
+    "teoria",
+    "parser"
+  ],
+  "author": {
+    "name": "Jakob Miland",
+    "email": "saebekassebil@gmail.com",
+    "url": "http://saebekassebil.me"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/saebekassebil/daccord",
+  "devDependencies": {
+    "tape": "^2.13.3"
+  }
+}
