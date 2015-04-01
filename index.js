@@ -1,9 +1,11 @@
 var SYMBOLS = {
-  'min': ['m3', 'P5'],
   'm': ['m3', 'P5'],
+  'mi': ['m3', 'P5'],
+  'min': ['m3', 'P5'],
   '-': ['m3', 'P5'],
 
   'M': ['M3', 'P5'],
+  'ma': ['M3', 'P5'],
   '': ['M3', 'P5'],
 
   '+': ['M3', 'A5'],
@@ -24,6 +26,7 @@ var SYMBOLS = {
 module.exports = function(symbol) {
   var c, parsing = 'quality', additionals = [], name, chordLength = 2
   var notes = ['P1', 'M3', 'P5', 'm7', 'M9', 'P11', 'M13'];
+  var explicitMajor = false;
 
   function setChord(name) {
     var intervals = SYMBOLS[name];
@@ -41,16 +44,23 @@ module.exports = function(symbol) {
       return;
 
     if (parsing === 'quality') {
-      var shortQuality = symbol.substr(i, 3).toLowerCase();
-      if (shortQuality in SYMBOLS)
-        name = shortQuality;
+      var sub3 = (i + 2) < len ? symbol.substr(i, 3).toLowerCase() : null;
+      var sub2 = (i + 1) < len ? symbol.substr(i, 2).toLowerCase() : null;
+      if (sub3 in SYMBOLS)
+        name = sub3;
+      else if (sub2 in SYMBOLS)
+        name = sub2;
       else if (c in SYMBOLS)
         name = c;
       else
         name = '';
-      
+
       if (name)
         setChord(name);
+
+      if (name === 'M' || name === 'ma' || name === 'maj')
+        explicitMajor = true;
+
 
       i += name.length - 1;
       parsing = 'extension';
@@ -65,6 +75,8 @@ module.exports = function(symbol) {
 
         if (name === 'o' || name === 'dim')
           notes[3] = 'd7';
+        else if (explicitMajor)
+          notes[3] = 'M7';
 
         i += c >= 10 ? 1 : 0;
       } else if (c === 6) {
