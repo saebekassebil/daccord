@@ -48,5 +48,15 @@ var daccord = require('daccord');
 ### daccord(chordstring)
 
 Return an array of intervals (including the tonic, that is `P1`), which
-constitutes the full chord, with all implied intervals. If a `chordstring` is
-unparsable, an error will be *thrown* with details.
+constitutes the full chord, with all implied intervals.
+
+If a `chordstring` is unparsable, an error will be *thrown* with details:
+```js
+// ParseError:
+{
+  message: String,  // The full error message
+  title: String,    // The error title
+  token: String,    // The erronous token
+  index: Number     // The index of the token in the chordstring
+}
+```
