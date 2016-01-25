@@ -10,6 +10,8 @@ test('Parsing chops', function(t) {
     cache(res, exp);
   }
 
+
+  // Test parsing
   t.deepEqual(daccord('-'), ['P1', 'm3', 'P5']);
   t.deepEqual(daccord('m'), ['P1', 'm3', 'P5']);
   t.deepEqual(daccord('mi'), ['P1', 'm3', 'P5']);
@@ -52,5 +54,15 @@ test('Parsing chops', function(t) {
   t.deepEqual(daccord('M9'), ['P1', 'M3', 'P5', 'M7', 'M9']);
   t.deepEqual(daccord('Ma9'), ['P1', 'M3', 'P5', 'M7', 'M9']);
   t.deepEqual(daccord('mM7'), ['P1', 'm3', 'P5', 'M7']);
+
+  // Test error throwing
+  function willItThrow(symbol) {
+    return function() {
+      return daccord(symbol);
+    }
+  }
+  t.throws(willItThrow('add911'), null, 'Will not accept weird "add" alterations');
+  t.throws(willItThrow('#8'), null, 'Will not alterate unalterable intervals');
+  t.throws(willItThrow('#15'), null, 'Will not alterate intervals over 13');
   t.end();
 });
