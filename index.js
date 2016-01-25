@@ -1,3 +1,13 @@
+var TypedError = require('error/typed');
+
+var ParseError = TypedError({
+  type: 'parse',
+  message: 'ParseError: {title} for token "{token}" at index {index}',
+  title: null,
+  token: null,
+  index: null
+});
+
 var SYMBOLS = {
   'm': ['m3', 'P5'],
   'mi': ['m3', 'P5'],
@@ -70,8 +80,13 @@ module.exports = function(symbol) {
       if (!isNaN(c) && c !== 6) {
         chordLength = (c - 1) / 2;
 
-        if (chordLength !== Math.round(chordLength))
-          return new Error('Invalid interval extension: ' + c.toString(10));
+        if (chordLength !== Math.round(chordLength)) {
+          throw ParseError({
+            title: 'Invalid interval extension',
+            token: c,
+            index: i
+          });
+        }
 
         if (name === 'o' || name === 'dim')
           notes[3] = 'd7';
@@ -90,17 +105,29 @@ module.exports = function(symbol) {
       var alterations = symbol.substr(i).split(/(#|b|add|maj|sus|M)/i),
           next, flat = false, sharp = false;
 
-      if (alterations.length === 1)
-        return new Error('Invalid alteration');
-      else if (alterations[0].length !== 0)
-        return new Error('Invalid token: \'' + alterations[0] + '\'');
+      if (alterations.length === 1) {
+        throw ParseError({
+          title: 'Invalid alteration',
+          token: symbol.substr(i),
+          index: i
+        });
+      }
+      else if (alterations[0].length !== 0) {
+        throw ParseError({
+          title: 'Invalid token',
+          token: alterations[0],
+          index: i
+        });
+      }
 
       var ignore = false;
-      alterations.forEach(function(alt, i, arr) {
+      var alterationStringIndex = 0;
+      alterations.forEach(function(alt, altIndex, arr) {
+        alterationStringIndex += alt.length;
         if (ignore || !alt.length)
           return ignore = false;
 
-        var next = arr[i + 1], lower = alt.toLowerCase();
+        var next = arr[altIndex + 1], lower = alt.toLowerCase();
         if (alt === 'M' || lower === 'maj') {
           if (next === '7')
             ignore = true;
@@ -124,6 +151,13 @@ module.exports = function(symbol) {
             additionals.push('P11');
           else if (next === '13')
             additionals.push('M13');
+          else {
+            throw ParseError({
+              title: 'Invalid token',
+              token: next,
+              index: i + alterationStringIndex
+            });
+          }
 
           ignore = true
         } else if (lower === 'b') {
@@ -132,8 +166,21 @@ module.exports = function(symbol) {
           sharp = true;
         } else {
           var token = +alt, quality, intPos;
-          if (isNaN(token) || String(token).length !== alt.length)
-            return new Error('Invalid token: \'' + alt + '\'');
+          if (isNaN(token) || String(token).length !== alt.length) {
+            throw ParseError({
+              title: 'Invalid token',
+              token: alt,
+              index: i + alterationStringIndex - alt.length
+            });
+          }
+
+          if (token > 13) {
+            throw ParseError({
+              title: 'Cannot alterate intervals bigger than 13',
+              token: alt,
+              index: i + alterationStringIndex - alt.length
+            });
+          }
 
           if (token === 6) {
             if (sharp)
@@ -152,8 +199,13 @@ module.exports = function(symbol) {
           if (chordLength < intPos)
             chordLength = intPos;
 
-          if (token < 5 || token === 7 || intPos !== Math.round(intPos))
-            return new Error('Invalid interval alteration: ' + token);
+          if (token < 5 || token === 7 || intPos !== Math.round(intPos)) {
+            throw ParseError({
+              title: 'Invalid alteration',
+              token: token,
+              index: i + alterationStringIndex - alt.length
+            });
+          }
 
           quality = notes[intPos][0];
 
